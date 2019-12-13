@@ -33,14 +33,14 @@ class Object:
 
 def generateInt(letter):
     if letter == 'X':
-        return random.randint(0, 768)
+        return random.randint(0, screenWidth-32)
     elif letter == 'Y':
-        return random.randint(0, 20)
+        return random.randint(0, screenHeight//20)
     elif letter == 'C':
         return random.randint(1, 2)
 
 #player settings
-player = Object(368, 536, 0)
+player = Object(screenWidth/2-32, screenHeight-64, 0)
 player.defineImage('player.png')
 
 #gift and enemy setting
@@ -49,7 +49,7 @@ objectCount = 10
 
 for i in range(objectCount):
 
-    if random.randint(1, 4) > 3:
+    if random.randint(1, 5) > 4:
         gift = Object(generateInt('X'), generateInt('Y'), generateInt('C'))
         gift.defineImage('gift.png')
         objectList.append(gift)
@@ -82,12 +82,25 @@ while running:
         item.objectY += item.objectChange
         item.objectDraw()
 
-        if item.objectY >= 600:
+        if item.objectY >= screenHeight:
             item.objectX = generateInt('X')
             item.objectY = generateInt('Y')
             item.objectChange = generateInt('C')
 
     player.objectMove()
+    if player.objectX <= 0:
+        player.objectX = 0
+    elif player.objectX >= screenWidth-64:
+        player.objectX = screenWidth-64
+ 
     player.objectDraw()
     
     pygame.display.update()
+
+    #todo
+    #add collision
+    #add life points
+    #add score
+    #add background
+    #add music
+    #add sounds

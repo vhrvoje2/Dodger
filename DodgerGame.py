@@ -10,35 +10,55 @@ import pygame
 import random
 import math
 
+#screen settings
 screenWidth = 800
 screenHeight = 600
-
-class Enemy:
-    def __init__(self, enemyX, enemyY):
-        self.enemyX = enemyX
-        self.enemyY = enemyY
-        self.enemyImg = pygame.image.load('enemy.png')
-
-    def enemyDraw(self):
-        screen.blit(self.enemyImg, (self.enemyY, self.enemyY))
-
-class Player:
-    def __init__(self, playerX, playerY):
-        self.playerX = playerX
-        self.playerY = playerY
-        self.playerImg = pygame.image.load('player.png')
-
-    def playerDraw(self):
-        screen.blit(self.playerImg, (self.playerX, self.playerY))
-
-    def playerMove(self, playerChangeX):
-        self.playerX += playerChangeX
-
 screen = pygame.display.set_mode((screenWidth, screenHeight))
-player = Player(368, 536)
-playerChangeX = 0
 
-enemy = Enemy(random.randint(0, 768), 0)
+#object class
+class Object:
+    def __init__(self, objectX, objectY, objectChange):
+        self.objectX = objectX
+        self.objectY = objectY
+        self.objectChange = objectChange
+
+    def defineImage(self, path):  
+        self.objectImage = pygame.image.load(path)
+
+    def objectDraw(self):
+        screen.blit(self.objectImage, (self.objectX, self.objectY))
+
+    def objectMove(self):
+        self.objectX += self.objectChange
+
+def generateInt(letter):
+    if letter == 'X':
+        return random.randint(0, 768)
+    elif letter == 'Y':
+        return random.randint(0, 20)
+    elif letter == 'C':
+        return random.randint(1, 2)
+
+#player settings
+player = Object(368, 536, 0)
+player.defineImage('player.png')
+
+#gift and enemy setting
+objectList = []
+objectCount = 10
+
+for i in range(objectCount):
+
+    if random.randint(1, 4) > 3:
+        gift = Object(generateInt('X'), generateInt('Y'), generateInt('C'))
+        gift.defineImage('gift.png')
+        objectList.append(gift)
+    else:
+        enemy = Object(generateInt('X'), generateInt('Y'), generateInt('C'))
+        enemy.defineImage('enemy.png')
+        objectList.append(enemy)
+        
+#main loop
 running = True
 
 while running:
@@ -50,16 +70,24 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                playerChangeX -= 1
+                player.objectChange -= 1
             if event.key == pygame.K_RIGHT:
-                playerChangeX += 1
+                player.objectChange += 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerChangeX = 0
+                player.objectChange = 0
 
-    enemy.enemyDraw()
 
-    player.playerMove(playerChangeX)
-    player.playerDraw()
+    for item in objectList:
+        item.objectY += item.objectChange
+        item.objectDraw()
+
+        if item.objectY >= 600:
+            item.objectX = generateInt('X')
+            item.objectY = generateInt('Y')
+            item.objectChange = generateInt('C')
+
+    player.objectMove()
+    player.objectDraw()
     
     pygame.display.update()
